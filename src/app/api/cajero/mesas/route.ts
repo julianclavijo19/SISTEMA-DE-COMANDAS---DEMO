@@ -13,7 +13,7 @@ export async function GET() {
         id,
         order_number,
         status,
-        type,
+        order_type,
         subtotal,
         tax,
         discount,
