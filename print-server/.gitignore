@@ -13,6 +13,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Archivos de entorno
-.env
-.env.local
+# Archivos de entorno (habilitados para DEMO)
+# .env
+# .env.local

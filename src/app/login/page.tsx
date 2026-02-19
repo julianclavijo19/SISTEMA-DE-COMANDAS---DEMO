@@ -69,9 +69,23 @@ export default function LoginPage() {
             <div className="bg-blue-600 p-3 rounded-full mb-4">
               <UtensilsCrossed className="h-8 w-8 text-white" />
             </div>
+            <div className="bg-amber-100 border border-amber-400 rounded-lg px-4 py-2 mb-3">
+              <p className="text-amber-800 text-sm font-semibold text-center">🎯 DEMO - Sistema de Comandas</p>
+            </div>
             <h1 className="text-2xl font-bold text-gray-900 text-center">Sistema de Comandas</h1>
-            <p className="text-gray-600 mt-1 font-medium">Restaurante El Dragón del Tarra</p>
+            <p className="text-gray-600 mt-1 font-medium">Versión Demostración</p>
             <p className="text-gray-400 text-sm mt-2">Ingresa a tu cuenta</p>
+          </div>
+
+          {/* Credenciales Demo */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-xs">
+            <p className="font-semibold text-gray-700 mb-2 text-center">Credenciales de prueba:</p>
+            <div className="grid grid-cols-2 gap-1 text-gray-600">
+              <span className="font-medium">Admin:</span><span>admin@demo.com / admin123</span>
+              <span className="font-medium">Cajero:</span><span>cajero@demo.com / cajero123</span>
+              <span className="font-medium">Mesero:</span><span>mesero@demo.com / mesero123</span>
+              <span className="font-medium">Cocina:</span><span>cocina@demo.com / cocina123</span>
+            </div>
           </div>
 
           {/* Form */}

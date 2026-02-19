@@ -5,11 +5,11 @@ node_modules/
 .next/
 out/
 
-# Environment files
-.env
-.env.local
-.env.production
-.env*.local
+# Environment files (habilitados para DEMO)
+# .env
+# .env.local
+# .env.production
+# .env*.local
 
 # Logs
 *.log
