@@ -7,6 +7,7 @@ import {
   Table2, Clock, Users, DollarSign, ChefHat, 
   CheckCircle, AlertCircle, RefreshCw
 } from 'lucide-react'
+import { TableDiningIcon } from '@/components/ui/table-dining-icon'
 import Link from 'next/link'
 
 interface Area {
@@ -264,7 +265,12 @@ export default function MesasCajeroPage() {
                     </span>
                   </div>
                   
-                  <h3 className="font-bold text-lg text-gray-900">{table.name}</h3>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-7 h-7 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <TableDiningIcon className="w-3.5 h-3.5 text-blue-500" />
+                    </div>
+                    <h3 className="font-bold text-lg text-gray-900">{table.name}</h3>
+                  </div>
                   
                   <div className="flex items-center justify-center gap-1 text-xs text-gray-500 mt-1">
                     <Users className="h-3 w-3" />

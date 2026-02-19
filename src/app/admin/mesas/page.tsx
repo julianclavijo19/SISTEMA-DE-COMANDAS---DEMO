@@ -6,6 +6,7 @@ import { formatCurrency, getTimeDifference } from '@/lib/utils'
 import { 
   Users, Clock, Search, RefreshCw, Timer
 } from 'lucide-react'
+import { TableDiningIcon } from '@/components/ui/table-dining-icon'
 
 interface Table {
   id: string
@@ -188,7 +189,12 @@ export default function MesasPage() {
                   <Card className={`${isReady ? 'ring-2 ring-gray-900' : ''}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{table.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <TableDiningIcon className="w-4.5 h-4.5 text-blue-500" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900">{table.name}</h3>
+                        </div>
                         <div className={`w-2.5 h-2.5 rounded-full ${config.dotColor}`} />
                       </div>
                       

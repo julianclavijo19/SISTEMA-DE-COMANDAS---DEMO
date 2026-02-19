@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, Search, Users } from 'lucide-react'
+import { TableDiningIcon } from '@/components/ui/table-dining-icon'
 import toast from 'react-hot-toast'
 import { TableModal } from '@/components/admin/table-modal'
 
@@ -243,9 +244,14 @@ export default function TablesPage() {
               {filteredTables.map((table) => (
                 <tr key={table.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{table.name}</p>
-                      <p className="text-xs text-gray-500">#{table.number}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <TableDiningIcon className="w-4 h-4 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{table.name}</p>
+                        <p className="text-xs text-gray-500">#{table.number}</p>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
