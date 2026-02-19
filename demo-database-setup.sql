@@ -812,162 +812,68 @@ END $$;
 
 -- ==================== CATEGORÍAS DEL MENÚ ====================
 INSERT INTO categories (id, name, description, color) VALUES
-  (gen_random_uuid()::text, 'Entradas', 'Aperitivos y entradas para comenzar', '#3b82f6'),
-  (gen_random_uuid()::text, 'Sopas', 'Sopas tradicionales chinas y criollas', '#10b981'),
-  (gen_random_uuid()::text, 'Arroces', 'Variedades de arroz frito y especial', '#f59e0b'),
-  (gen_random_uuid()::text, 'Chow Mein', 'Tallarines salteados al wok', '#ef4444'),
-  (gen_random_uuid()::text, 'Chop Suey', 'Vegetales salteados con proteína', '#8b5cf6'),
-  (gen_random_uuid()::text, 'Especialidades', 'Platos exclusivos del chef', '#ec4899'),
-  (gen_random_uuid()::text, 'Carnes', 'Platos con res y cerdo', '#dc2626'),
-  (gen_random_uuid()::text, 'Pollo', 'Preparaciones con pollo', '#f97316'),
-  (gen_random_uuid()::text, 'Mariscos', 'Camarones, pescado y frutos del mar', '#0ea5e9'),
-  (gen_random_uuid()::text, 'Platos Colombianos', 'Platos típicos colombianos', '#84cc16'),
-  (gen_random_uuid()::text, 'Bebidas', 'Refrescos, jugos y bebidas', '#06b6d4'),
-  (gen_random_uuid()::text, 'Postres', 'Dulces y postres', '#d946ef');
+  (gen_random_uuid()::text, 'Comidas Rápidas', NULL, '#f97316'),
+  (gen_random_uuid()::text, 'Platos Especiales', NULL, '#ef4444'),
+  (gen_random_uuid()::text, 'Arroz Especial', NULL, '#eab308'),
+  (gen_random_uuid()::text, 'Combos', NULL, '#22c55e');
 
 
 -- ==================== PRODUCTOS DEL MENÚ ====================
 DO $$
 DECLARE
-  v_entradas TEXT; v_sopas TEXT; v_arroces TEXT; v_chowmein TEXT;
-  v_chopsuey TEXT; v_especialidades TEXT; v_carnes TEXT; v_pollo TEXT;
-  v_mariscos TEXT; v_colombianos TEXT; v_bebidas TEXT; v_postres TEXT;
+  v_comidas_rapidas TEXT;
+  v_platos_especiales TEXT;
+  v_arroz_especial TEXT;
+  v_combos TEXT;
 BEGIN
-  SELECT id INTO v_entradas FROM categories WHERE name = 'Entradas' LIMIT 1;
-  SELECT id INTO v_sopas FROM categories WHERE name = 'Sopas' LIMIT 1;
-  SELECT id INTO v_arroces FROM categories WHERE name = 'Arroces' LIMIT 1;
-  SELECT id INTO v_chowmein FROM categories WHERE name = 'Chow Mein' LIMIT 1;
-  SELECT id INTO v_chopsuey FROM categories WHERE name = 'Chop Suey' LIMIT 1;
-  SELECT id INTO v_especialidades FROM categories WHERE name = 'Especialidades' LIMIT 1;
-  SELECT id INTO v_carnes FROM categories WHERE name = 'Carnes' LIMIT 1;
-  SELECT id INTO v_pollo FROM categories WHERE name = 'Pollo' LIMIT 1;
-  SELECT id INTO v_mariscos FROM categories WHERE name = 'Mariscos' LIMIT 1;
-  SELECT id INTO v_colombianos FROM categories WHERE name = 'Platos Colombianos' LIMIT 1;
-  SELECT id INTO v_bebidas FROM categories WHERE name = 'Bebidas' LIMIT 1;
-  SELECT id INTO v_postres FROM categories WHERE name = 'Postres' LIMIT 1;
+  SELECT id INTO v_comidas_rapidas FROM categories WHERE name = 'Comidas Rápidas' LIMIT 1;
+  SELECT id INTO v_platos_especiales FROM categories WHERE name = 'Platos Especiales' LIMIT 1;
+  SELECT id INTO v_arroz_especial FROM categories WHERE name = 'Arroz Especial' LIMIT 1;
+  SELECT id INTO v_combos FROM categories WHERE name = 'Combos' LIMIT 1;
 
-  -- ENTRADAS
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Rollitos Primavera (4 und)', 'Crujientes rollitos rellenos de vegetales', 12000, v_entradas, 8, true),
-    (gen_random_uuid()::text, 'Wonton Frito (6 und)', 'Masa crujiente rellena de cerdo y camarón', 14000, v_entradas, 10, true),
-    (gen_random_uuid()::text, 'Empanadas Chinas (4 und)', 'Gyozas al vapor o fritas', 13000, v_entradas, 12, true),
-    (gen_random_uuid()::text, 'Costillitas BBQ', 'Costillas de cerdo en salsa barbecue china', 22000, v_entradas, 15, true),
-    (gen_random_uuid()::text, 'Camarones Apanados (8 und)', 'Camarones empanizados con salsa agridulce', 24000, v_entradas, 12, true),
-    (gen_random_uuid()::text, 'Picada China para 2', 'Surtido de entradas: rollitos, wontons, costillitas', 38000, v_entradas, 15, true);
+  -- COMIDAS RÁPIDAS
+  INSERT INTO products (id, name, description, price, category_id, prep_time) VALUES
+    (gen_random_uuid()::text, 'Hamburguesa Mixta', '120 gramos de carne, 100 gramos de lomo, huevo a la plancha, tocineta, jamón, queso tajado, vegetales, papa francesa', 18000, v_comidas_rapidas, 15),
+    (gen_random_uuid()::text, 'Hamburguesa Especial', '120 gramos de carne, huevo a la plancha, tocineta, jamón, queso tajado, vegetales, papa francesa', 15000, v_comidas_rapidas, 12),
+    (gen_random_uuid()::text, 'Hamburguesa Normal', '120 gramos de carne, jamón y queso', 12000, v_comidas_rapidas, 10),
+    (gen_random_uuid()::text, 'Perro Tipo Americano', 'Salchicha grande de pollo, vegetales, papa rápida, queso y salsas', 8000, v_comidas_rapidas, 8),
+    (gen_random_uuid()::text, 'Perro Normal', 'Salchicha de pollo, vegetales, papa rápida, queso y salsa', 6000, v_comidas_rapidas, 6),
+    (gen_random_uuid()::text, 'Picada Para 2 Personas', 'Papa francesa, lomo de cerdo al barril, salchicha, chorizo ahumado, chorizo coctelero, vegetales, salsa, queso rayado', 30000, v_comidas_rapidas, 20),
+    (gen_random_uuid()::text, 'Picada Familiar', 'Papa francesa, lomo cerdo al barril, salchicha, chorizo ahumado, chorizo coctelero, vegetales, salsa y queso rayado', 50000, v_comidas_rapidas, 25),
+    (gen_random_uuid()::text, 'Salchipapa', 'Papas francesas, salchicha, vegetales, salsa y queso', 15000, v_comidas_rapidas, 12);
 
-  -- SOPAS
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Sopa Wonton', 'Caldo con wontons de cerdo y verduras', 15000, v_sopas, 10, true),
-    (gen_random_uuid()::text, 'Sopa de Maíz con Pollo', 'Cremosa sopa de maíz estilo cantonés', 14000, v_sopas, 10, true),
-    (gen_random_uuid()::text, 'Sopa Agripicante', 'Tradicional sopa hot and sour', 16000, v_sopas, 12, true),
-    (gen_random_uuid()::text, 'Sopa de Mariscos', 'Sopa especial con camarones y pescado', 22000, v_sopas, 15, true),
-    (gen_random_uuid()::text, 'Consomé de Pollo', 'Caldo tradicional colombiano', 10000, v_sopas, 8, true);
+  -- PLATOS ESPECIALES
+  INSERT INTO products (id, name, description, price, category_id, prep_time) VALUES
+    (gen_random_uuid()::text, 'Pollo Rebosado', '150 gramos de papa francesa, 15 trozos de pollo rebosado', 20000, v_platos_especiales, 18),
+    (gen_random_uuid()::text, 'Pollo Agridulce', '150 gramos de papas francesa, 15 trozos de pollo en salsa agridulce', 20000, v_platos_especiales, 18),
+    (gen_random_uuid()::text, 'Lomito Ajo', '150 gramos de papa a la francesa, 250 g de lomito en salsa de ajo', 20000, v_platos_especiales, 18),
+    (gen_random_uuid()::text, 'Espagueti', 'Pasta larga con pollo, cerdo, camarón, vegetales a la Juliana', 20000, v_platos_especiales, 15),
+    (gen_random_uuid()::text, 'Ensalada de Camarón', '250 g de camarón con vegetales', 30000, v_platos_especiales, 12),
+    (gen_random_uuid()::text, 'Ensalada de Pollo', '250 gramos de pollo con vegetales', 20000, v_platos_especiales, 12);
 
-  -- ARROCES
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Arroz Frito con Pollo', 'Arroz salteado con pollo y vegetales', 18000, v_arroces, 12, true),
-    (gen_random_uuid()::text, 'Arroz Frito con Cerdo', 'Arroz salteado con cerdo asado', 18000, v_arroces, 12, true),
-    (gen_random_uuid()::text, 'Arroz Frito con Camarón', 'Arroz salteado con camarones frescos', 24000, v_arroces, 12, true),
-    (gen_random_uuid()::text, 'Arroz Frito Especial', 'Arroz con pollo, cerdo, camarón y vegetales', 26000, v_arroces, 15, true),
-    (gen_random_uuid()::text, 'Arroz Frito Tres Delicias', 'Arroz con jamón, pollo y huevo', 20000, v_arroces, 12, true),
-    (gen_random_uuid()::text, 'Arroz Blanco', 'Porción de arroz blanco', 5000, v_arroces, 5, true);
+  -- ARROZ ESPECIAL
+  INSERT INTO products (id, name, description, price, category_id, prep_time) VALUES
+    (gen_random_uuid()::text, 'Arroz Personal', 'Arroz frito especial, cerdo, camarones, jamón y pollo esmechado', 15000, v_arroz_especial, 15),
+    (gen_random_uuid()::text, 'Arroz Grande', 'Arroz frito especial, cerdo, camarones, jamón y pollo esmechado', 30000, v_arroz_especial, 18),
+    (gen_random_uuid()::text, 'Familiar', 'Arroz frito especial, cerdo, camarones, jamón y pollo esmechado + 3 piezas de pollo frito', 45000, v_arroz_especial, 22),
+    (gen_random_uuid()::text, 'Arroz Solo Camarón 200 g', NULL, 20000, v_arroz_especial, 12),
+    (gen_random_uuid()::text, 'Arroz Solo Pollo 250 g', NULL, 16000, v_arroz_especial, 12),
+    (gen_random_uuid()::text, 'Arroz Solo Cerdo 200 g', NULL, 16000, v_arroz_especial, 12),
+    (gen_random_uuid()::text, 'Arroz Solo Jamón 250 g', NULL, 12000, v_arroz_especial, 10);
 
-  -- CHOW MEIN
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Chow Mein de Pollo', 'Tallarines salteados con pollo', 19000, v_chowmein, 12, true),
-    (gen_random_uuid()::text, 'Chow Mein de Cerdo', 'Tallarines salteados con cerdo', 19000, v_chowmein, 12, true),
-    (gen_random_uuid()::text, 'Chow Mein de Camarón', 'Tallarines salteados con camarones', 25000, v_chowmein, 12, true),
-    (gen_random_uuid()::text, 'Chow Mein Especial', 'Tallarines con pollo, cerdo y camarón', 27000, v_chowmein, 15, true),
-    (gen_random_uuid()::text, 'Chow Mein Vegetariano', 'Tallarines con tofu y vegetales', 17000, v_chowmein, 12, true);
-
-  -- CHOP SUEY
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Chop Suey de Pollo', 'Vegetales salteados con pollo', 18000, v_chopsuey, 12, true),
-    (gen_random_uuid()::text, 'Chop Suey de Cerdo', 'Vegetales salteados con cerdo', 18000, v_chopsuey, 12, true),
-    (gen_random_uuid()::text, 'Chop Suey de Camarón', 'Vegetales salteados con camarones', 24000, v_chopsuey, 12, true),
-    (gen_random_uuid()::text, 'Chop Suey Especial', 'Vegetales con pollo, cerdo y camarón', 26000, v_chopsuey, 15, true),
-    (gen_random_uuid()::text, 'Chop Suey Vegetariano', 'Solo vegetales frescos', 15000, v_chopsuey, 10, true);
-
-  -- ESPECIALIDADES
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Pollo General Tso', 'Pollo crujiente en salsa dulce picante', 26000, v_especialidades, 15, true),
-    (gen_random_uuid()::text, 'Pollo Kung Pao', 'Pollo con maní en salsa especiada', 25000, v_especialidades, 15, true),
-    (gen_random_uuid()::text, 'Res con Brócoli', 'Carne de res salteada con brócoli fresco', 28000, v_especialidades, 15, true),
-    (gen_random_uuid()::text, 'Camarones con Salsa de Ajo', 'Camarones en deliciosa salsa de ajo', 32000, v_especialidades, 12, true),
-    (gen_random_uuid()::text, 'Cerdo Agridulce', 'Cerdo en salsa agridulce con piña', 24000, v_especialidades, 15, true),
-    (gen_random_uuid()::text, 'Combinado Dragón Dorado', 'Para 2: arroz, chow mein, res y pollo', 52000, v_especialidades, 20, true),
-    (gen_random_uuid()::text, 'Bandeja Familiar (4 pers)', 'Arroz, chow mein, pollo, cerdo, camarón', 95000, v_especialidades, 25, true);
-
-  -- CARNES
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Res con Pimentón', 'Carne de res con pimentones de colores', 26000, v_carnes, 15, true),
-    (gen_random_uuid()::text, 'Res Mongoliana', 'Carne de res en salsa mongoliana', 28000, v_carnes, 15, true),
-    (gen_random_uuid()::text, 'Res con Champiñones', 'Res salteada con champiñones frescos', 27000, v_carnes, 15, true),
-    (gen_random_uuid()::text, 'Cerdo con Vegetales', 'Cerdo salteado con vegetales mixtos', 22000, v_carnes, 12, true),
-    (gen_random_uuid()::text, 'Cerdo Szechuan', 'Cerdo en salsa picante estilo Szechuan', 24000, v_carnes, 15, true),
-    (gen_random_uuid()::text, 'Costilla de Cerdo Frita', 'Costillas crujientes con salsa especial', 28000, v_carnes, 18, true);
-
-  -- POLLO
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Pollo Agridulce', 'Pollo crujiente en salsa agridulce', 22000, v_pollo, 15, true),
-    (gen_random_uuid()::text, 'Pollo con Piña', 'Pollo salteado con piña natural', 23000, v_pollo, 12, true),
-    (gen_random_uuid()::text, 'Pollo con Vegetales', 'Pollo con vegetales frescos salteados', 20000, v_pollo, 12, true),
-    (gen_random_uuid()::text, 'Pollo con Champiñones', 'Pollo salteado con champiñones', 22000, v_pollo, 12, true),
-    (gen_random_uuid()::text, 'Pollo Teriyaki', 'Pollo en salsa teriyaki japonesa', 24000, v_pollo, 15, true),
-    (gen_random_uuid()::text, 'Pollo con Curry', 'Pollo en cremosa salsa de curry', 23000, v_pollo, 15, true),
-    (gen_random_uuid()::text, 'Alitas BBQ Chinas (12 und)', 'Alitas en salsa BBQ estilo chino', 22000, v_pollo, 18, true);
-
-  -- MARISCOS
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Camarones con Vegetales', 'Camarones salteados con vegetales', 28000, v_mariscos, 12, true),
-    (gen_random_uuid()::text, 'Camarones Agridulce', 'Camarones en salsa agridulce', 30000, v_mariscos, 15, true),
-    (gen_random_uuid()::text, 'Camarones al Curry', 'Camarones en salsa de curry', 30000, v_mariscos, 15, true),
-    (gen_random_uuid()::text, 'Pescado Frito Entero', 'Mojarra frita con salsa especial', 35000, v_mariscos, 20, true),
-    (gen_random_uuid()::text, 'Camarones al Ajillo', 'Camarones salteados con ajo', 32000, v_mariscos, 12, true),
-    (gen_random_uuid()::text, 'Cazuela de Mariscos', 'Surtido de mariscos en salsa especial', 45000, v_mariscos, 20, true);
-
-  -- PLATOS COLOMBIANOS
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Bandeja Paisa', 'Fríjoles, arroz, carne, chicharrón, huevo, arepa', 32000, v_colombianos, 20, true),
-    (gen_random_uuid()::text, 'Churrasco con Papas', 'Churrasco de res con papas fritas', 35000, v_colombianos, 20, true),
-    (gen_random_uuid()::text, 'Pechuga a la Plancha', 'Pechuga de pollo con ensalada y arroz', 25000, v_colombianos, 15, true),
-    (gen_random_uuid()::text, 'Mojarra Frita', 'Mojarra entera frita con patacones', 30000, v_colombianos, 20, true),
-    (gen_random_uuid()::text, 'Cazuela de Fríjoles', 'Con chicharrón, carne y arroz', 22000, v_colombianos, 15, true),
-    (gen_random_uuid()::text, 'Sobrebarriga en Salsa', 'Sobrebarriga criolla con papas', 28000, v_colombianos, 20, true);
-
-  -- BEBIDAS
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Gaseosa Personal', 'Coca-Cola, Sprite, Fanta 350ml', 4000, v_bebidas, 1, true),
-    (gen_random_uuid()::text, 'Gaseosa Litro', 'Coca-Cola, Sprite, Fanta 1.5L', 8000, v_bebidas, 1, true),
-    (gen_random_uuid()::text, 'Jugo Natural', 'Limonada, naranja, maracuyá', 6000, v_bebidas, 5, true),
-    (gen_random_uuid()::text, 'Limonada de Coco', 'Limonada cremosa con coco', 8000, v_bebidas, 5, true),
-    (gen_random_uuid()::text, 'Té Helado', 'Té frío de limón o durazno', 5000, v_bebidas, 2, true),
-    (gen_random_uuid()::text, 'Té Chino Caliente', 'Té verde o jazmín', 4000, v_bebidas, 3, true),
-    (gen_random_uuid()::text, 'Agua Botella', 'Agua natural o con gas 600ml', 3000, v_bebidas, 1, true),
-    (gen_random_uuid()::text, 'Cerveza Nacional', 'Poker, Águila, Club Colombia', 6000, v_bebidas, 1, true),
-    (gen_random_uuid()::text, 'Cerveza Importada', 'Corona, Heineken, Budweiser', 10000, v_bebidas, 1, true);
-
-  -- POSTRES
-  INSERT INTO products (id, name, description, price, category_id, prep_time, is_available) VALUES
-    (gen_random_uuid()::text, 'Helado Frito', 'Helado de vainilla empanizado crujiente', 12000, v_postres, 8, true),
-    (gen_random_uuid()::text, 'Banana Split', 'Banano con helado, crema y salsas', 14000, v_postres, 5, true),
-    (gen_random_uuid()::text, 'Flan de Caramelo', 'Suave flan casero con caramelo', 8000, v_postres, 2, true),
-    (gen_random_uuid()::text, 'Arroz con Leche', 'Cremoso arroz con leche y canela', 7000, v_postres, 2, true),
-    (gen_random_uuid()::text, 'Tres Leches', 'Porción de pastel tres leches', 10000, v_postres, 2, true),
-    (gen_random_uuid()::text, 'Brownie con Helado', 'Brownie caliente con helado de vainilla', 14000, v_postres, 5, true);
+  -- COMBOS
+  INSERT INTO products (id, name, description, price, category_id, prep_time) VALUES
+    (gen_random_uuid()::text, 'Combo Pollo Agridulce', 'Arroz jamón + tajadas, ensalada y 6 trozos de pollo', 16000, v_combos, 15),
+    (gen_random_uuid()::text, 'Combo Pollo a la Plancha', 'Arroz jamón + ensalada + tajadas y 200 gramos de pechuga', 16000, v_combos, 15),
+    (gen_random_uuid()::text, 'Combo Pollo Frito', 'Arroz jamón, tajada, ensalada, 3 piezas de pollo frito', 16000, v_combos, 15),
+    (gen_random_uuid()::text, 'Combo Chuleta Natural', 'Arroz, jamón, tajada, ensalada, chuleta 200 gramos', 16000, v_combos, 15),
+    (gen_random_uuid()::text, 'Combo Chuleta Ahumada', 'Arroz jamón, tajada, ensalada, chuleta 200 gramos', 16000, v_combos, 15),
+    (gen_random_uuid()::text, 'Combo Lomito Ajo', 'Arroz jamón, papas a la francesa, 150 gramos de lomito en salsa de ajo', 16000, v_combos, 15);
 END $$;
 
 
--- ==================== DESCUENTOS PRECONFIGURADOS ====================
-INSERT INTO discounts (name, description, discount_type, value, is_active, requires_authorization) VALUES
-  ('Descuento Empleado 10%', 'Descuento para empleados del restaurante', 'PERCENTAGE', 10, true, false),
-  ('Descuento Empleado 20%', 'Descuento especial empleados', 'PERCENTAGE', 20, true, true),
-  ('Promoción del Día', 'Descuento promocional diario', 'PERCENTAGE', 15, true, false),
-  ('Cliente Frecuente', 'Descuento para clientes frecuentes', 'PERCENTAGE', 5, true, false),
-  ('Compensación', 'Descuento por compensación de servicio', 'PERCENTAGE', 100, true, true),
-  ('Descuento $5.000', 'Descuento fijo de $5.000', 'FIXED', 5000, true, false),
-  ('Descuento $10.000', 'Descuento fijo de $10.000', 'FIXED', 10000, true, true),
-  ('Cortesía', 'Cortesía de la casa', 'PERCENTAGE', 100, true, true);
+-- ==================== DESCUENTOS ====================
+-- Tabla creada vacía - configurar desde el panel de administración
 
 
 -- ==================== INGREDIENTES DE EJEMPLO ====================
