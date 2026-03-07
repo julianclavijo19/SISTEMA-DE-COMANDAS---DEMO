@@ -53,11 +53,11 @@ export async function POST(request: Request) {
         discount: 0,
         discount_rate: 0,
         price: parseFloat(item.unit_price).toFixed(2),
-        tax_rate: '0.00', // Productos de restaurante generalmente excluidos de IVA o con tasa 0 en el sandbox
+        tax_rate: '0.00', // Productos de restaurante excluidos de IVA
         unit_measure_id: '70', // Unidad
         standard_code_id: '1', // Estándar de adopción del contribuyente
-        is_excluded: '0',
-        tribute_id: '1', // IVA
+        is_excluded: '1', // Excluido de IVA
+        tribute_id: '21', // No aplica (ZZ) - consistente con tax_rate 0.00
         withholding_taxes: [],
       }))
     } else if (items && items.length > 0) {
@@ -72,8 +72,8 @@ export async function POST(request: Request) {
         tax_rate: item.tax_rate || '0.00',
         unit_measure_id: '70',
         standard_code_id: '1',
-        is_excluded: '0',
-        tribute_id: '1',
+        is_excluded: item.tax_rate && parseFloat(item.tax_rate) > 0 ? '0' : '1',
+        tribute_id: item.tax_rate && parseFloat(item.tax_rate) > 0 ? '1' : '21', // IVA si hay tasa, No aplica si 0%
         withholding_taxes: [],
       }))
     } else {
@@ -115,6 +115,7 @@ export async function POST(request: Request) {
       observation: observation || `Venta POS${orderData ? ` - Orden #${orderData.order_number}` : ''}`,
       payment_form: '1', // Contado
       payment_method: mapPaymentMethod(payment_method || 'cash'),
+      send_email: !!(customerData.email && customerData.email.length > 0), // Enviar email si hay correo válido
       customer: customerData,
       items: billItems,
     }

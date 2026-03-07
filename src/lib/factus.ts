@@ -117,6 +117,7 @@ export interface FactusBillRequest {
   payment_method: string // "10"=Efectivo, "48"=Tarjeta crédito, "49"=Tarjeta débito, "ZZZ"=Otro
   payment_due_date?: string // YYYY-MM-DD
   duration_measure?: string
+  send_email?: boolean // true para enviar la factura al correo del cliente
   customer: FactusCustomer
   items: FactusItem[]
 }
@@ -213,7 +214,7 @@ export async function getBillByNumber(number: string): Promise<any> {
  */
 export async function downloadBillPDF(number: string): Promise<string> {
   const result = await factusRequest(`/v1/bills/download-pdf/${number}`)
-  return result.data?.pdf_base_64_bytes || result.data?.pdf_base64 || ''
+  return result.data?.pdf_base_64_encoded || result.data?.pdf_base_64_bytes || result.data?.pdf_base64 || ''
 }
 
 /**
