@@ -69,11 +69,7 @@ export default function LoginPage() {
             <div className="bg-blue-600 p-3 rounded-full mb-4">
               <UtensilsCrossed className="h-8 w-8 text-white" />
             </div>
-            <div className="bg-amber-100 border border-amber-400 rounded-lg px-4 py-2 mb-3">
-              <p className="text-amber-800 text-sm font-semibold text-center">🎯 DEMO - Sistema de Comandas</p>
-            </div>
             <h1 className="text-2xl font-bold text-gray-900 text-center">Sistema de Comandas</h1>
-            <p className="text-gray-600 mt-1 font-medium">Versión Demostración</p>
             <p className="text-gray-400 text-sm mt-2">Ingresa a tu cuenta</p>
           </div>
 
