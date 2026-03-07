@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         unit_measure_id: '70', // Unidad
         standard_code_id: '1', // Estándar de adopción del contribuyente
         is_excluded: '1', // Excluido de IVA
-        tribute_id: '21', // No aplica (ZZ) - consistente con tax_rate 0.00
+        tribute_id: '1', // IVA (tribute tipo) - is_excluded=1 indica que está excluido
         withholding_taxes: [],
       }))
     } else if (items && items.length > 0) {
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
         unit_measure_id: '70',
         standard_code_id: '1',
         is_excluded: item.tax_rate && parseFloat(item.tax_rate) > 0 ? '0' : '1',
-        tribute_id: item.tax_rate && parseFloat(item.tax_rate) > 0 ? '1' : '21', // IVA si hay tasa, No aplica si 0%
+        tribute_id: '1', // IVA (siempre tribute_id=1; is_excluded indica si aplica o no)
         withholding_taxes: [],
       }))
     } else {

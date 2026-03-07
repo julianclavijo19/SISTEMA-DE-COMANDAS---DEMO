@@ -72,7 +72,16 @@ async function factusRequest(endpoint: string, options: RequestInit = {}): Promi
     } catch {
       errorData = { message: errorText }
     }
-    throw new Error(errorData?.message || errorData?.data?.message || `Error Factus: ${res.status}`)
+    // Construir mensaje detallado con los errores de validación de Factus
+    const validationErrors = errorData?.data?.errors || errorData?.errors
+    let errorMessage = errorData?.message || errorData?.data?.message || `Error Factus: ${res.status}`
+    if (validationErrors && typeof validationErrors === 'object') {
+      const details = Object.entries(validationErrors)
+        .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+        .join(' | ')
+      errorMessage = `${errorMessage} — ${details}`
+    }
+    throw new Error(errorMessage)
   }
 
   return res.json()
