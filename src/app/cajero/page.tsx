@@ -9,7 +9,7 @@ import {
   CreditCard, Banknote, X, Printer, CheckCircle,
   Clock, TrendingUp, Wallet, AlertCircle, ArrowRight,
   Play, Square, Receipt, ChevronRight, AlertTriangle,
-  ShoppingBag, Truck, Edit2, RotateCcw
+  ShoppingBag, Truck, Edit2, RotateCcw, FileText, Loader2
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { printInvoice, type OrderData } from '@/lib/printer'
@@ -150,6 +150,14 @@ export default function CajeroPage() {
   // Pending orders warning modal
   const [showPendingWarning, setShowPendingWarning] = useState(false)
   const [pendingOrders, setPendingOrders] = useState<Array<{orderNumber: number; tableName: string; total: number; type: string}>>([])
+
+  // Factura Electrónica
+  const [showFEModal, setShowFEModal] = useState(false)
+  const [feProcessing, setFEProcessing] = useState(false)
+  const [feAsConsumidorFinal, setFEAsConsumidorFinal] = useState(true)
+  const [feCustomer, setFECustomer] = useState({
+    document_type_id: '3', identification: '', names: '', email: '', phone: '', address: '', company: '', legal_organization_id: '2', tribute_id: '21',
+  })
 
   // Get user from cookie
   useEffect(() => {
@@ -438,6 +446,39 @@ export default function CajeroPage() {
     setDiscountAmount(0)
     setDiscountType('percent')
     setShowDiscountOptions(false)
+    setShowFEModal(false)
+    setFEAsConsumidorFinal(true)
+    setFECustomer({ document_type_id: '3', identification: '', names: '', email: '', phone: '', address: '', company: '', legal_organization_id: '2', tribute_id: '21' })
+  }
+
+  // Emitir factura electrónica
+  const handleEmitirFE = async () => {
+    const order = selectedTable?.current_order || selectedTakeawayOrder
+    if (!order) return
+    setFEProcessing(true)
+    try {
+      const body: any = { order_id: order.id, payment_method: paymentMethod.toLowerCase() }
+      if (!feAsConsumidorFinal) {
+        if (!feCustomer.identification || !feCustomer.names) {
+          toast.error('Ingrese identificación y nombre del cliente')
+          setFEProcessing(false)
+          return
+        }
+        body.customer = feCustomer
+      }
+      const res = await fetch('/api/facturacion/crear', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const result = await res.json()
+      if (res.ok) {
+        toast.success(`Factura electrónica ${result.data?.bill?.number || ''} emitida`)
+        setShowFEModal(false)
+      } else {
+        toast.error(result.error || 'Error al emitir factura electrónica')
+      }
+    } catch (error) {
+      toast.error('Error al emitir factura electrónica')
+    } finally {
+      setFEProcessing(false)
+    }
   }
 
   // Enter to confirm payment when modal is open
@@ -1092,6 +1133,13 @@ export default function CajeroPage() {
                   )}
                 </button>
               </div>
+              <button
+                onClick={() => setShowFEModal(true)}
+                className="w-full mt-2 py-2 border border-gray-200 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors text-gray-700"
+              >
+                <FileText className="h-4 w-4" />
+                Factura Electrónica
+              </button>
             </div>
           </div>
         </div>
@@ -1270,6 +1318,217 @@ export default function CajeroPage() {
                     <>
                       <CheckCircle className="h-5 w-5" />
                       Cobrar
+                    </>
+                  )}
+                </button>
+              </div>
+              <button
+                onClick={() => setShowFEModal(true)}
+                className="w-full mt-2 py-2 border border-gray-200 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors text-gray-700"
+              >
+                <FileText className="h-4 w-4" />
+                Factura Electrónica
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Factura Electrónica Modal */}
+      {showFEModal && (selectedTable?.current_order || selectedTakeawayOrder) && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Factura Electrónica</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Orden #{(selectedTable?.current_order || selectedTakeawayOrder)?.order_number} - {formatCurrency(calculateFinalTotal())}
+                </p>
+              </div>
+              <button onClick={() => setShowFEModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              {/* Tipo de cliente */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de cliente</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setFEAsConsumidorFinal(true)}
+                    className={`flex-1 py-2 rounded-lg text-sm border transition-colors ${
+                      feAsConsumidorFinal ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    Consumidor Final
+                  </button>
+                  <button
+                    onClick={() => setFEAsConsumidorFinal(false)}
+                    className={`flex-1 py-2 rounded-lg text-sm border transition-colors ${
+                      !feAsConsumidorFinal ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    Con datos del cliente
+                  </button>
+                </div>
+              </div>
+
+              {/* Datos del cliente */}
+              {!feAsConsumidorFinal && (
+                <div className="space-y-3 border-t pt-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Tipo de documento</label>
+                      <select
+                        value={feCustomer.document_type_id}
+                        onChange={(e) => setFECustomer({ ...feCustomer, document_type_id: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                      >
+                        <option value="3">Cédula de Ciudadanía</option>
+                        <option value="6">NIT</option>
+                        <option value="5">Cédula de Extranjería</option>
+                        <option value="7">Pasaporte</option>
+                        <option value="2">Tarjeta de Identidad</option>
+                        <option value="8">Doc. ID Extranjero</option>
+                        <option value="9">PEP</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Número de documento</label>
+                      <input
+                        type="text"
+                        value={feCustomer.identification}
+                        onChange={(e) => setFECustomer({ ...feCustomer, identification: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        placeholder="Número"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Nombre completo / Razón social</label>
+                    <input
+                      type="text"
+                      value={feCustomer.names}
+                      onChange={(e) => setFECustomer({ ...feCustomer, names: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      placeholder="Nombre o razón social"
+                    />
+                  </div>
+                  {feCustomer.document_type_id === '6' && (
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Nombre comercial</label>
+                      <input
+                        type="text"
+                        value={feCustomer.company}
+                        onChange={(e) => setFECustomer({ ...feCustomer, company: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        placeholder="Nombre comercial (opcional)"
+                      />
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Correo electrónico</label>
+                      <input
+                        type="email"
+                        value={feCustomer.email}
+                        onChange={(e) => setFECustomer({ ...feCustomer, email: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        placeholder="correo@ejemplo.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-1">Teléfono</label>
+                      <input
+                        type="text"
+                        value={feCustomer.phone}
+                        onChange={(e) => setFECustomer({ ...feCustomer, phone: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        placeholder="3001234567"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Dirección</label>
+                    <input
+                      type="text"
+                      value={feCustomer.address}
+                      onChange={(e) => setFECustomer({ ...feCustomer, address: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      placeholder="Dirección (opcional)"
+                    />
+                  </div>
+                  {feCustomer.document_type_id === '6' && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-1">Organización</label>
+                        <select
+                          value={feCustomer.legal_organization_id}
+                          onChange={(e) => setFECustomer({ ...feCustomer, legal_organization_id: e.target.value })}
+                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                        >
+                          <option value="1">Persona Jurídica</option>
+                          <option value="2">Persona Natural</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-1">Responsabilidad fiscal</label>
+                        <select
+                          value={feCustomer.tribute_id}
+                          onChange={(e) => setFECustomer({ ...feCustomer, tribute_id: e.target.value })}
+                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                        >
+                          <option value="21">No aplica</option>
+                          <option value="1">IVA</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Resumen */}
+              <div className="border-t pt-4">
+                <div className="p-3 bg-gray-50 rounded-lg space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Orden</span>
+                    <span className="font-medium">#{(selectedTable?.current_order || selectedTakeawayOrder)?.order_number}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Cliente</span>
+                    <span className="font-medium">
+                      {feAsConsumidorFinal ? 'Consumidor Final' : (feCustomer.names || 'Sin nombre')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm font-semibold pt-1 border-t">
+                    <span>Total</span>
+                    <span>{formatCurrency(calculateFinalTotal())}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowFEModal(false)}
+                  className="flex-1 py-3 border border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleEmitirFE}
+                  disabled={feProcessing}
+                  className="flex-1 py-3 bg-gray-900 text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {feProcessing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Emitiendo...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4" />
+                      Emitir Factura
                     </>
                   )}
                 </button>

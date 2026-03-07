@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, CreditCard, Receipt, Percent,
   Clock, BarChart3, Wallet, RotateCcw, Printer, UserCheck,
-  Search, LogOut, Menu, X, ChevronDown, TrendingUp, Utensils, Zap, ShoppingBag, ClipboardList
+  Search, LogOut, Menu, X, ChevronDown, TrendingUp, Utensils, Zap, ShoppingBag, ClipboardList, FileText
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -53,6 +53,7 @@ const menuSections = [
       { href: '/cajero/estadisticas', label: 'Estadísticas', icon: TrendingUp },
       { href: '/cajero/reportes', label: 'Reportes', icon: BarChart3 },
       { href: '/cajero/precios', label: 'Consulta Precios', icon: Search },
+      { href: '/cajero/facturacion-electronica', label: 'Facturación Electrónica', icon: FileText },
     ]
   },
 ]

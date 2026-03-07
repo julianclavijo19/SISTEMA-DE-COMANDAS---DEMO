@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Printer, RotateCcw, Percent,
   Receipt, Wallet, Search, Table2, ClipboardList,
   Users, FolderTree, Package, MapPin, Warehouse, Shield,
-  Settings, History, LogOut, Menu, X, ChevronDown, TrendingUp, Banknote, BarChart3, Utensils, Zap
+  Settings, History, LogOut, Menu, X, ChevronDown, TrendingUp, Banknote, BarChart3, Utensils, Zap, FileText
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -44,6 +44,7 @@ const adminSections = [
       { href: '/admin/transacciones', label: 'Transacciones Diarias', icon: Receipt },
       { href: '/admin/reportes', label: 'Reportes', icon: TrendingUp },
       { href: '/admin/precios', label: 'Consulta Precios', icon: Search },
+      { href: '/admin/facturacion-electronica', label: 'Facturación Electrónica', icon: FileText },
     ]
   },
   {
