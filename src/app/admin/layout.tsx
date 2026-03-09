@@ -34,6 +34,7 @@ const adminSections = [
       { href: '/admin/products', label: 'Productos', icon: Package },
       { href: '/admin/areas', label: 'Áreas', icon: MapPin },
       { href: '/admin/tables', label: 'Configurar Mesas', icon: Table2 },
+      { href: '/admin/mesas', label: 'Mesas (Vistas)', icon: Table2 },
       { href: '/admin/inventory', label: 'Inventario', icon: Warehouse },
     ]
   },
@@ -45,12 +46,6 @@ const adminSections = [
       { href: '/admin/reportes', label: 'Reportes', icon: TrendingUp },
       { href: '/admin/precios', label: 'Consulta Precios', icon: Search },
       { href: '/admin/facturacion-electronica', label: 'Facturación Electrónica', icon: FileText },
-    ]
-  },
-  {
-    title: 'Servicio',
-    items: [
-      { href: '/admin/mesas', label: 'Mesas', icon: Table2 },
     ]
   },
   {
@@ -90,7 +85,7 @@ const cajaSections = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [expandedSections, setExpandedSections] = useState<string[]>(['Principal', 'Gestión', 'Consultas', 'Servicio', 'Sistema'])
+  const [expandedSections, setExpandedSections] = useState<string[]>(['Principal', 'Gestión', 'Consultas', 'Sistema'])
   const [cajaExpanded, setCajaExpanded] = useState(true)
   const [expandedCajaSections, setExpandedCajaSections] = useState<string[]>(['Cajas', 'Facturación', 'Operaciones', 'Historial'])
   const pathname = usePathname()

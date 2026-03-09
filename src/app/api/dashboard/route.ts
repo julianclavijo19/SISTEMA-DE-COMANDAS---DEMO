@@ -91,15 +91,29 @@ export async function GET(request: Request) {
     const totalSales = totalSalesFromPayments
     const totalOrders = allOrders.length
 
-    // Ventas diarias (usar pagos del periodo ya filtrados)
+    // Ventas diarias - siempre mostrar mínimo 7 días para el gráfico
     const dailySales: { date: string; total: number }[] = []
-    const daysToShow = period === 'month' ? 30 : period === 'week' ? 7 : 1
+    const daysToShow = period === 'month' ? 30 : 7
     
-    const nowUTC = new Date()
-    const colombiaTime = new Date(nowUTC.getTime() - (COLOMBIA_OFFSET_HOURS * 60 * 60 * 1000))
-    const todayYear = colombiaTime.getUTCFullYear()
-    const todayMonth = colombiaTime.getUTCMonth()
-    const todayDay = colombiaTime.getUTCDate()
+    const nowUTC2 = new Date()
+    const colombiaTime2 = new Date(nowUTC2.getTime() - (COLOMBIA_OFFSET_HOURS * 60 * 60 * 1000))
+    const todayYear = colombiaTime2.getUTCFullYear()
+    const todayMonth = colombiaTime2.getUTCMonth()
+    const todayDay = colombiaTime2.getUTCDate()
+
+    // Obtener pagos del rango del gráfico (puede ser más amplio que el periodo de KPIs)
+    const chartStartDate = new Date(Date.UTC(todayYear, todayMonth, todayDay - (daysToShow - 1), COLOMBIA_OFFSET_HOURS, 0, 0, 0))
+    let chartPayments = paymentsList
+    if (chartStartDate < startDate) {
+      // Necesitamos pagos adicionales para el gráfico
+      const { data: extraPayments } = await supabase
+        .from('payments')
+        .select('id, amount, method, created_at, order_id')
+        .gte('created_at', chartStartDate.toISOString())
+        .lt('created_at', startDateISO)
+        .order('created_at', { ascending: false })
+      chartPayments = [...(extraPayments || []), ...paymentsList]
+    }
     
     for (let i = daysToShow - 1; i >= 0; i--) {
       const targetDate = new Date(Date.UTC(todayYear, todayMonth, todayDay - i))
@@ -110,7 +124,7 @@ export async function GET(request: Request) {
       const dayStartUTC = new Date(Date.UTC(targetYear, targetMonth, targetDay, COLOMBIA_OFFSET_HOURS, 0, 0, 0))
       const dayEndUTC = new Date(Date.UTC(targetYear, targetMonth, targetDay + 1, COLOMBIA_OFFSET_HOURS - 1, 59, 59, 999))
       
-      const dayPayments = paymentsList.filter(p => {
+      const dayPayments = chartPayments.filter(p => {
         const pDate = new Date(p.created_at)
         return pDate >= dayStartUTC && pDate <= dayEndUTC
       })

@@ -25,6 +25,7 @@ interface Order {
   orderNumber: number
   status: string
   type?: string
+  notes?: string
   subtotal: number
   tax: number
   total: number
@@ -533,7 +534,23 @@ function CobrarContent() {
                           <div className="text-sm text-gray-500">
                             {order.items.length} items • {order.waiter?.name || 'Sin mesero'}
                           </div>
-                          <div className="text-xs text-gray-400 mt-1">
+                          {/* Detalle de items con notas */}
+                          <div className="mt-2 space-y-1 border-t border-gray-100 pt-2">
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="text-xs text-gray-600">
+                                <span className="font-medium">{item.quantity}x {item.product.name}</span>
+                                {item.notes && (
+                                  <span className="ml-1 text-amber-600 italic">({item.notes})</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                          {order.notes && (
+                            <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs text-amber-700">
+                              <span className="font-semibold">Nota:</span> {order.notes}
+                            </div>
+                          )}
+                          <div className="text-xs text-gray-400 mt-2">
                             {new Date(order.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </CardContent>
@@ -551,6 +568,11 @@ function CobrarContent() {
           <Card>
             <CardHeader className="pb-3 border-b">
               <CardTitle className="text-lg">Detalle de la Cuenta</CardTitle>
+              {selectedOrder.notes && (
+                <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+                  <span className="font-semibold">Nota del pedido:</span> {selectedOrder.notes}
+                </div>
+              )}
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-3 max-h-[40vh] overflow-y-auto">

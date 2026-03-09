@@ -385,149 +385,131 @@ export default function MeseroParaLlevarPage() {
 
         {/* Cart */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-4">
-            <CardHeader className="pb-3 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <ShoppingBag className="h-5 w-5 text-blue-500" />
-                  Para Llevar
-                </CardTitle>
-                <span className="text-sm text-gray-500">{cart.length} items</span>
-              </div>
+          <Card className="border-gray-200">
+            <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50 rounded-t-lg">
+              <CardTitle className="text-base text-gray-900 flex items-center gap-2">
+                <ShoppingBag className="h-4 w-4" />
+                Para llevar ({cart.length} productos)
+              </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-3">
               {cart.length === 0 ? (
-                <p className="text-gray-500 text-center py-8 text-sm">
-                  Selecciona productos para agregar
-                </p>
+                <div className="text-center py-8 text-gray-400 text-sm">
+                  Selecciona productos
+                </div>
               ) : (
                 <div className="space-y-3 max-h-[40vh] overflow-y-auto">
                   {cart.map((item) => (
-                    <div 
-                      key={item.id} 
-                      className={`border border-gray-200 rounded-lg p-3 ${
-                        item.priority === 'urgent' ? 'border-blue-500 bg-blue-50' : ''
-                      }`}
-                    >
+                    <div key={item.id} className={`border border-gray-100 rounded-lg p-3 ${item.priority === 'urgent' ? 'border-blue-500 bg-blue-50/30' : ''}`}>
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-gray-900 truncate">{item.product.name}</p>
-                          <p className="text-gray-600 text-sm">
-                            {formatCurrency(item.product.price * item.quantity)}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="p-1 hover:bg-gray-100 rounded"
-                          >
-                            <Minus className="h-4 w-4 text-gray-600" />
-                          </button>
-                          <span className="w-6 text-center font-medium text-sm">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="p-1 hover:bg-gray-100 rounded"
-                          >
-                            <Plus className="h-4 w-4 text-gray-600" />
-                          </button>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
+                        <p className="font-medium text-sm text-gray-900 flex-1 leading-tight">
+                          {item.product.name}
+                        </p>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
 
-                      {/* Item options */}
-                      <div className="mt-2 space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Notas especiales..."
-                          value={item.notes}
-                          onChange={(e) => updateItemNotes(item.id, e.target.value)}
-                          className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-900"
-                        />
-
-                        <div className="flex gap-2">
-                          <select
-                            value={item.tiempo || ''}
-                            onChange={(e) => updateItemTiempo(item.id, e.target.value as any || undefined)}
-                            className="text-xs px-2 py-1.5 border border-gray-200 rounded flex-1 focus:outline-none focus:ring-1 focus:ring-gray-900"
-                          >
-                            <option value="">Tiempo</option>
-                            <option value="entrada">Entrada</option>
-                            <option value="plato_fuerte">Plato fuerte</option>
-                            <option value="postre">Postre</option>
-                          </select>
-
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center gap-2">
                           <button
-                            onClick={() => updateItemPriority(item.id, item.priority === 'urgent' ? 'normal' : 'urgent')}
-                            className={`text-xs px-2 py-1.5 rounded border transition-colors ${
-                              item.priority === 'urgent' 
-                                ? 'bg-blue-500 text-white border-blue-500' 
-                                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                            }`}
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="w-7 h-7 rounded-md bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                           >
-                            Urgente
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="font-bold text-gray-900 w-6 text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="w-7 h-7 rounded-md bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 transition-colors"
+                          >
+                            <Plus className="h-3 w-3" />
                           </button>
                         </div>
+                        <span className="font-bold text-gray-900 text-sm">
+                          {formatCurrency(item.product.price * item.quantity)}
+                        </span>
+                      </div>
+
+                      <input
+                        type="text"
+                        value={item.notes}
+                        onChange={(e) => updateItemNotes(item.id, e.target.value)}
+                        placeholder="Nota (opcional)"
+                        className="w-full mt-2 px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-gray-300"
+                      />
+
+                      <div className="flex gap-2 mt-2">
+                        <select
+                          value={item.tiempo || ''}
+                          onChange={(e) => updateItemTiempo(item.id, e.target.value as any || undefined)}
+                          className="text-xs px-2 py-1.5 border border-gray-200 rounded flex-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                        >
+                          <option value="">Tiempo</option>
+                          <option value="entrada">Entrada</option>
+                          <option value="plato_fuerte">Plato fuerte</option>
+                          <option value="postre">Postre</option>
+                        </select>
+
+                        <button
+                          onClick={() => updateItemPriority(item.id, item.priority === 'urgent' ? 'normal' : 'urgent')}
+                          className={`text-xs px-2 py-1.5 rounded border transition-colors ${
+                            item.priority === 'urgent' 
+                              ? 'bg-blue-500 text-white border-blue-500' 
+                              : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          Urgente
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Order notes */}
-              {cart.length > 0 && (
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Notas generales del pedido</label>
-                  <textarea
-                    placeholder="Notas para todo el pedido..."
-                    value={orderNotes}
-                    onChange={(e) => setOrderNotes(e.target.value)}
-                    className="w-full text-sm px-3 py-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-gray-900"
-                    rows={2}
-                  />
-                </div>
-              )}
-
-              {/* Total */}
-              <div className="pt-4 border-t border-gray-100">
-                <div className="flex justify-between items-center text-lg font-semibold">
-                  <span className="text-gray-700">Total</span>
-                  <span className="text-gray-900">{formatCurrency(total)}</span>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  El cobro se realizará en la caja principal
-                </p>
+              {/* Notes */}
+              <div className="mt-3">
+                <input
+                  type="text"
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  placeholder="Nota general del pedido..."
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
               </div>
 
-              {/* Actions */}
-              <div className="space-y-2">
-                <Button
+              {/* Total */}
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-sm text-gray-500">Total estimado</span>
+                  <span className="text-xl font-bold text-gray-900">{formatCurrency(total)}</span>
+                </div>
+
+                <button
                   onClick={handleSendToKitchen}
-                  disabled={cart.length === 0 || sending}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={sending || cart.length === 0}
+                  className="w-full py-3 bg-gray-900 text-white rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {sending ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   ) : (
-                    <Send className="h-4 w-4 mr-2" />
+                    <>
+                      <Send className="h-5 w-5" />
+                      Enviar a Cocina
+                    </>
                   )}
-                  Enviar a Cocina
-                </Button>
+                </button>
 
                 {cart.length > 0 && (
-                  <Button
+                  <button
                     onClick={clearCart}
-                    variant="outline"
-                    className="w-full"
+                    className="w-full mt-2 py-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    Limpiar Pedido
-                  </Button>
+                    Limpiar pedido
+                  </button>
                 )}
               </div>
             </CardContent>
