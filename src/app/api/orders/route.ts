@@ -293,34 +293,36 @@ export async function POST(request: Request) {
     const tipoOrden = orderType || 'DINE_IN'
     let mesaComanda = tableName
     if (!finalTableId) {
-      mesaComanda = tipoOrden === 'DELIVERY' ? 'Domicilio' : tipoOrden === 'TAKEOUT' || tipoOrden === 'TAKEAWAY' ? 'Para llevar' : 'N/A'
+      mesaComanda = tipoOrden === 'DELIVERY' ? 'Domicilio' : tipoOrden === 'TAKEOUT' || tipoOrden === 'TAKEAWAY' ? 'Para llevar' : tipoOrden === 'COUNTER' ? 'Mostrador' : 'N/A'
     }
 
-    // Encolar comanda para el servidor de impresión (polling)
-    const kitchenPrintPayload = {
-      mesa: mesaComanda,
-      mesero: waiterName,
-      area: areaName || 'N/A',
-      orderType: tipoOrden,
-      type: tipoOrden,
-      items: orderItems.map((item: any) => ({
-        nombre: products?.find((p: any) => p.id === item.product_id)?.name || 'Producto',
-        cantidad: item.quantity,
-        notas: item.notes || '',
-      })),
-      total: Number(total) || 0,
-      hora: new Date().toLocaleTimeString('es-CO', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'America/Bogota',
-      }),
+    // Las ventas por mostrador (COUNTER) NO se imprimen en la comanda de cocina
+    if (tipoOrden !== 'COUNTER') {
+      const kitchenPrintPayload = {
+        mesa: mesaComanda,
+        mesero: waiterName,
+        area: areaName || 'N/A',
+        orderType: tipoOrden,
+        type: tipoOrden,
+        items: orderItems.map((item: any) => ({
+          nombre: products?.find((p: any) => p.id === item.product_id)?.name || 'Producto',
+          cantidad: item.quantity,
+          notas: item.notes || '',
+        })),
+        total: Number(total) || 0,
+        hora: new Date().toLocaleTimeString('es-CO', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Bogota',
+        }),
+      }
+      await supabase
+        .from('print_queue')
+        .insert({ type: 'kitchen', payload: kitchenPrintPayload })
+        .then(({ error }) => {
+          if (error) console.error('Error encolando impresión:', error)
+        })
     }
-    await supabase
-      .from('print_queue')
-      .insert({ type: 'kitchen', payload: kitchenPrintPayload })
-      .then(({ error }) => {
-        if (error) console.error('Error encolando impresión:', error)
-      })
 
     // Obtener la orden completa para devolver al cliente
     const { data: fullOrder } = await supabase

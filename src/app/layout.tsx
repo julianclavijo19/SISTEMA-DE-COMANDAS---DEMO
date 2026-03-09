@@ -7,8 +7,8 @@ import { Providers } from '@/components/providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Comandas Digitales',
-  description: 'Sistema de gestión de comandas para restaurantes',
+  title: "Piero's Ocaña",
+  description: 'Sistema POS - Piero\'s Ocaña',
   manifest: '/manifest.json',
 }
 

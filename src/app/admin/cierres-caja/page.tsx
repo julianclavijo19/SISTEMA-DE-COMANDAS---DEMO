@@ -140,18 +140,13 @@ export default function CierresCajaPage() {
                     <th className="px-4 py-3 font-medium text-right">Efectivo</th>
                     <th className="px-4 py-3 font-medium text-right">Tarjeta</th>
                     <th className="px-4 py-3 font-medium text-right">Transferencia</th>
-                    <th className="px-4 py-3 font-medium text-right">Total Cierre</th>
+                    <th className="px-4 py-3 font-medium text-right">Esperado Caja</th>
+                    <th className="px-4 py-3 font-medium text-right">Conteo Cierre</th>
                     <th className="px-4 py-3 font-medium text-right">Diferencia</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {registers.map((register, index) => {
-                    // Total cierre = Base + Efectivo + Tarjeta + Transferencia
-                    const totalCierre = Number(register.opening_amount || 0) + 
-                                        Number(register.cash_sales || 0) + 
-                                        Number(register.card_sales || 0) + 
-                                        Number(register.transfer_sales || 0)
-                    
                     return (
                       <tr key={register.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-sm text-gray-600">
@@ -183,8 +178,15 @@ export default function CierresCajaPage() {
                         <td className="px-4 py-3 text-sm text-gray-600 text-right">
                           {formatCurrency(register.transfer_sales)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
-                          {formatCurrency(totalCierre)}
+                        <td className="px-4 py-3 text-sm text-blue-600 text-right font-semibold">
+                          {formatCurrency(Number(register.opening_amount || 0) + Number(register.cash_sales || 0))}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right font-semibold">
+                          {register.closing_amount !== null ? (
+                            <span className="text-gray-900">{formatCurrency(register.closing_amount)}</span>
+                          ) : (
+                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Abierta</span>
+                          )}
                         </td>
                         <td className={`px-4 py-3 text-sm text-right font-medium ${getDifferenceColor(register.difference)}`}>
                           {register.difference !== null ? (

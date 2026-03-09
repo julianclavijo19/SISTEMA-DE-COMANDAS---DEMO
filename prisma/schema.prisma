@@ -156,6 +156,7 @@ enum OrderType {
   DINE_IN       // Para comer aquí
   TAKEOUT       // Para llevar
   DELIVERY      // Domicilio
+  COUNTER       // Por mostrador
 }
 
 model OrderItem {

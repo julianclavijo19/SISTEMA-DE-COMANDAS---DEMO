@@ -24,6 +24,9 @@ export interface OrderData {
   changeAmount?: number
   customerCount?: number
   createdAt?: string
+  customerName?: string
+  customerAddress?: string
+  customerPhone?: string
 }
 
 export interface TicketConfig {
@@ -37,7 +40,7 @@ export interface TicketConfig {
 }
 
 const DEFAULT_CONFIG: TicketConfig = {
-  restaurantName: 'RESTAURANTE',
+  restaurantName: "PIERO'S OCAÑA",
   address: '',
   phone: '',
   nit: '',
@@ -166,6 +169,12 @@ export function generateInvoiceTicket(order: OrderData): string {
     lines.push(`Mesa: ${order.tableName}${waiterStr}`)
   } else if (order.waiterName) {
     lines.push(`Atendido: ${order.waiterName}`)
+  }
+  if (order.customerName) {
+    lines.push(separator)
+    lines.push(`Cliente: ${order.customerName}`)
+    if (order.customerPhone) lines.push(`Tel: ${order.customerPhone}`)
+    if (order.customerAddress) lines.push(`Dir: ${order.customerAddress}`)
   }
   lines.push(separator)
 

@@ -327,15 +327,15 @@ export default function MeseroParaLlevarPage() {
 
           {/* Categories */}
           {!searchQuery && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 flex-wrap">
               {categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedCategory === category.id
                       ? 'bg-gray-900 text-white'
-                      : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {category.name}
@@ -345,27 +345,35 @@ export default function MeseroParaLlevarPage() {
           )}
 
           {/* Products list */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto">
-            {filteredProducts.map((product) => (
-              <Card
-                key={product.id}
-                className="cursor-pointer hover:shadow-md transition-all active:scale-98"
-                onClick={() => addToCart(product)}
-              >
-                <CardContent className="p-4">
-                  <h3 className="font-medium text-gray-900 text-sm line-clamp-2">{product.name}</h3>
-                  <p className="text-gray-900 font-semibold mt-2">
-                    {formatCurrency(product.price)}
-                  </p>
-                  {product.prepTime && (
-                    <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
-                      <Clock className="h-3 w-3" />
-                      {product.prepTime} min
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-1">
+            {filteredProducts.map((product) => {
+              const inCart = cart.find((item) => item.product.id === product.id)
+              return (
+                <Card
+                  key={product.id}
+                  className={`cursor-pointer hover:shadow-md transition-all active:scale-98 ${inCart ? 'ring-1 ring-blue-400' : ''}`}
+                  onClick={() => addToCart(product)}
+                >
+                  <CardContent className="p-4 relative">
+                    {inCart && (
+                      <span className="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        {inCart.quantity}
+                      </span>
+                    )}
+                    <h3 className="font-medium text-gray-900 text-sm line-clamp-2">{product.name}</h3>
+                    <p className="text-gray-900 font-semibold mt-2">
+                      {formatCurrency(product.price)}
+                    </p>
+                    {product.prepTime && (
+                      <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                        <Clock className="h-3 w-3" />
+                        {product.prepTime} min
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
 
           {filteredProducts.length === 0 && (

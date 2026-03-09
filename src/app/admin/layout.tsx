@@ -68,8 +68,7 @@ const cajaSections = [
   {
     title: 'Cajas',
     items: [
-      { href: '/admin/caja', label: 'Caja - Restaurante Chino', icon: Utensils },
-      { href: '/admin/caja-comidas-rapidas', label: 'Caja - Comidas Rápidas', icon: Zap },
+      { href: '/admin/caja', label: 'Caja', icon: Utensils },
     ]
   },
   {

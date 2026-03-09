@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, CreditCard, Receipt, Percent,
   Clock, BarChart3, Wallet, RotateCcw, Printer, UserCheck,
-  Search, LogOut, Menu, X, ChevronDown, TrendingUp, Utensils, Zap, ShoppingBag, ClipboardList, FileText
+  Search, LogOut, Menu, X, ChevronDown, TrendingUp, Utensils, Zap, ShoppingBag, ClipboardList, FileText, ShoppingCart
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -23,13 +23,13 @@ const menuSections = [
     items: [
       { href: '/cajero/tomar-pedido', label: 'Tomar Pedido Mesa', icon: ClipboardList },
       { href: '/cajero/para-llevar', label: 'Pedidos Para Llevar', icon: ShoppingBag },
+      { href: '/cajero/mostrador', label: 'Venta Mostrador', icon: ShoppingCart },
     ]
   },
   {
     title: 'Cajas',
     items: [
-      { href: '/cajero', label: 'Caja - Restaurante Chino', icon: Utensils },
-      { href: '/cajero/comidas-rapidas', label: 'Caja - Comidas Rápidas', icon: Zap },
+      { href: '/cajero', label: 'Caja', icon: Utensils },
     ]
   },
   {
@@ -116,7 +116,7 @@ export default function CajeroLayout({ children }: { children: React.ReactNode }
           }`}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-900">Caja</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Piero's Ocaña</h1>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-gray-500 hover:text-gray-700"

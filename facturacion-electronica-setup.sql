@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS electronic_invoices (
   customer_name VARCHAR(255) DEFAULT 'Consumidor Final',
   customer_identification VARCHAR(50),
   customer_email VARCHAR(255),
-  order_id UUID REFERENCES orders(id),
+  order_id TEXT REFERENCES orders(id),
   public_url TEXT,
   qr_image TEXT,
   payment_method VARCHAR(10),

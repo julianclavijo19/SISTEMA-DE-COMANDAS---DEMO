@@ -9,7 +9,7 @@ import {
   CreditCard, Banknote, X, Printer, CheckCircle,
   Clock, TrendingUp, Wallet, AlertCircle, ArrowRight,
   Play, Square, Receipt, ChevronRight, AlertTriangle,
-  ShoppingBag, Truck, Edit2, RotateCcw, FileText, Loader2
+  ShoppingBag, Truck, Edit2, RotateCcw, FileText, Loader2, ShoppingCart
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { printInvoice, type OrderData } from '@/lib/printer'
@@ -96,6 +96,7 @@ interface TakeawayOrder {
   id: string
   order_number: number
   type: string
+  order_type: string
   status: string
   subtotal: number
   tax: number
@@ -113,6 +114,7 @@ export default function CajeroPage() {
   const [user, setUser] = useState<User | null>(null)
   const [areas, setAreas] = useState<Area[]>([])
   const [takeawayOrders, setTakeawayOrders] = useState<TakeawayOrder[]>([])
+  const [counterOrders, setCounterOrders] = useState<TakeawayOrder[]>([])
   const [stats, setStats] = useState({ 
     total_tables: 0, available: 0, occupied: 0, 
     pending_orders: 0, total_pending: 0,
@@ -221,10 +223,14 @@ export default function CajeroPage() {
           takeaway_orders: 0, takeaway_total: 0 
         })
         
-        // Filter takeaway/delivery orders (orders without table_id)
-        const takeaway = (data.orders || []).filter((o: any) => 
-          !o.table_id
+        // Split orders: counter (COUNTER type) and para llevar (TAKEOUT/DELIVERY)
+        const counter = (data.orders || []).filter((o: any) => 
+          !o.table_id && (o.order_type === 'COUNTER' || o.type === 'COUNTER')
         )
+        const takeaway = (data.orders || []).filter((o: any) => 
+          !o.table_id && o.order_type !== 'COUNTER' && o.type !== 'COUNTER'
+        )
+        setCounterOrders(counter)
         setTakeawayOrders(takeaway)
       }
     } catch (error) {
@@ -412,7 +418,12 @@ export default function CajeroPage() {
 
     const orderData: OrderData = {
       orderNumber: order.order_number,
-      tableName: selectedTable?.name || (selectedTakeawayOrder?.type === 'DELIVERY' ? 'Domicilio' : 'Para Llevar'),
+      tableName: selectedTable?.name || 
+        (selectedTakeawayOrder?.order_type === 'COUNTER' 
+          ? 'Mostrador' 
+          : (selectedTakeawayOrder?.order_type === 'DELIVERY' 
+            ? 'Domicilio' 
+            : 'Para Llevar')),
       waiterName: selectedTable?.waiter?.name || selectedTakeawayOrder?.waiter?.name || '',
       createdAt: order.created_at,
       items: order.items?.map(item => ({
@@ -727,12 +738,56 @@ export default function CajeroPage() {
               <p className="text-3xl font-bold mt-1">{formatCurrency(stats.total_pending + stats.takeaway_total)}</p>
             </div>
             <div className="text-right">
-              <p className="text-4xl font-bold">{stats.pending_orders + takeawayOrders.length}</p>
+              <p className="text-4xl font-bold">{stats.pending_orders + takeawayOrders.length + counterOrders.length}</p>
               <p className="text-gray-300 text-sm">pedidos pendientes</p>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Counter (Mostrador) Orders Section */}
+      {counterOrders.length > 0 && (
+        <div>
+          <h2 className="text-sm font-medium text-amber-700 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <ShoppingCart className="h-4 w-4" />
+            Por Mostrador ({counterOrders.length})
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            {counterOrders.map((order) => (
+              <div
+                key={order.id}
+                onClick={() => setSelectedTakeawayOrder(order)}
+                className="cursor-pointer"
+              >
+                <Card className="transition-all hover:shadow-md ring-2 ring-amber-400">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-1 mb-2">
+                      <ShoppingCart className="h-4 w-4 text-amber-600" />
+                      <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-medium">
+                        Mostrador
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">#{order.order_number}</h3>
+                    <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-500">{order.items?.length || 0} items</span>
+                        <span className="font-bold text-gray-900">{formatCurrency(order.total)}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-gray-400">
+                        <Timer className="h-3 w-3" />
+                        <span>{getTimeDifference(order.created_at)}</span>
+                      </div>
+                      <button className="w-full mt-2 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-lg flex items-center justify-center gap-1 hover:bg-amber-700">
+                        Cobrar <ChevronRight className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Takeaway/Delivery Orders Section */}
       {takeawayOrders.length > 0 && (
@@ -751,13 +806,13 @@ export default function CajeroPage() {
                 <Card className="transition-all hover:shadow-md ring-2 ring-blue-500">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-1 mb-2">
-                      {order.type === 'DELIVERY' ? (
+                      {order.order_type === 'DELIVERY' ? (
                         <Truck className="h-4 w-4 text-blue-600" />
                       ) : (
                         <ShoppingBag className="h-4 w-4 text-blue-600" />
                       )}
                       <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                        {order.type === 'DELIVERY' ? 'Domicilio' : 'P/Llevar'}
+                        {order.order_type === 'DELIVERY' ? 'Domicilio' : 'P/Llevar'}
                       </span>
                     </div>
                     
@@ -791,35 +846,6 @@ export default function CajeroPage() {
         <Users className="h-4 w-4" />
         Mesas
       </h2>
-
-      {/* Search and filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar mesa..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          />
-        </div>
-        <div className="flex gap-2">
-          {(['pending', 'all'] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === f 
-                  ? 'bg-gray-900 text-white' 
-                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {f === 'pending' ? 'Por Cobrar' : 'Todas'}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {filteredAreas.length === 0 ? (
         <Card>
@@ -1158,7 +1184,11 @@ export default function CajeroPage() {
                     <ShoppingBag className="h-5 w-5 text-blue-600" />
                   )}
                   <h2 className="text-xl font-semibold text-gray-900">
-                    {selectedTakeawayOrder.type === 'DELIVERY' ? 'Domicilio' : 'Para Llevar'}
+                    {selectedTakeawayOrder.order_type === 'COUNTER'
+                      ? 'Venta Mostrador'
+                      : selectedTakeawayOrder.order_type === 'DELIVERY'
+                        ? 'Domicilio'
+                        : 'Para Llevar'}
                   </h2>
                 </div>
                 <p className="text-sm text-gray-500">

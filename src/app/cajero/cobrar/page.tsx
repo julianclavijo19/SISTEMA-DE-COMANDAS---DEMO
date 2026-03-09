@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/u
 import { formatCurrency, formatMiles, parseMiles } from '@/lib/utils'
 import {
   DollarSign, CreditCard, Receipt, Search, Users,
-  Percent, CheckCircle, Split, ArrowLeft, Printer, Tag, FileText, Loader2, X
+  Percent, CheckCircle, Split, ArrowLeft, Printer, Tag, FileText, Loader2, X, ShoppingCart
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -74,6 +74,11 @@ function CobrarContent() {
   const [splitMode, setSplitMode] = useState(false)
   const [splitWays, setSplitWays] = useState(2)
   const [splitByItems, setSplitByItems] = useState(false)
+
+  // Customer info for takeout
+  const [customerName, setCustomerName] = useState('')
+  const [customerAddress, setCustomerAddress] = useState('')
+  const [customerPhone, setCustomerPhone] = useState('')
 
   // Factura Electrónica
   const [showFEModal, setShowFEModal] = useState(false)
@@ -273,7 +278,10 @@ function CobrarContent() {
       tip: calculateTip(),
       paymentMethod: paymentMethod,
       receivedAmount: paymentMethod === 'cash' ? receivedAmount : calculateTotal(),
-      changeAmount: calculateChange()
+      changeAmount: calculateChange(),
+      customerName: customerName || undefined,
+      customerAddress: customerAddress || undefined,
+      customerPhone: customerPhone || undefined
     }
 
     try {
@@ -294,6 +302,9 @@ function CobrarContent() {
     setMixedPayments([])
     setSplitMode(false)
     setSelectedConfiguredDiscount(null)
+    setCustomerName('')
+    setCustomerAddress('')
+    setCustomerPhone('')
     setShowFEModal(false)
     setFEAsConsumidorFinal(true)
     setFECustomer({
@@ -364,14 +375,18 @@ function CobrarContent() {
     setMixedPayments(mixedPayments.filter((_, i) => i !== index))
   }
 
-  const filteredOrders = orders.filter(o =>
-    o.orderNumber.toString().includes(searchQuery) ||
-    (o.table?.name || 'para llevar').toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredOrders = orders.filter(o => {
+    const label = o.type === 'COUNTER' ? 'mostrador' : (o.table?.name || 'para llevar')
+    return (
+      o.orderNumber.toString().includes(searchQuery) ||
+      label.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })
 
-  // Separate table orders from takeaway orders
-  const tableOrders = filteredOrders.filter(o => o.table !== null && o.table !== undefined && o.type !== 'TAKEOUT')
-  const takeawayOrders = filteredOrders.filter(o => o.table === null || o.table === undefined || o.type === 'TAKEOUT')
+  // Separate orders into 3 sections
+  const counterOrders = filteredOrders.filter(o => o.type === 'COUNTER')
+  const takeawayOrders = filteredOrders.filter(o => (o.table === null || o.table === undefined || o.type === 'TAKEOUT') && o.type !== 'COUNTER')
+  const tableOrders = filteredOrders.filter(o => o.table !== null && o.table !== undefined && o.type !== 'TAKEOUT' && o.type !== 'COUNTER')
 
   if (loading) {
     return (
@@ -394,7 +409,7 @@ function CobrarContent() {
             {selectedOrder ? `Cobrar #${selectedOrder.orderNumber}` : 'Cobrar'}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            {selectedOrder ? (selectedOrder.table?.name || 'Para Llevar') : `${orders.length} pedidos pendientes`}
+            {selectedOrder ? (selectedOrder.type === 'COUNTER' ? 'Mostrador' : selectedOrder.table?.name || 'Para Llevar') : `${orders.length} pedidos pendientes`}
           </p>
         </div>
       </div>
@@ -423,22 +438,60 @@ function CobrarContent() {
             </Card>
           ) : (
             <div className="space-y-6">
-              {/* Takeaway orders section */}
-              {takeawayOrders.length > 0 && (
+              {/* Counter (Mostrador) orders section */}
+              {counterOrders.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Para Llevar ({takeawayOrders.length})</h2>
+                  <h2 className="text-sm font-medium text-amber-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    Por Mostrador ({counterOrders.length})
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {takeawayOrders.map(order => (
+                    {counterOrders.map(order => (
                       <Card
                         key={order.id}
-                        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-gray-900"
+                        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-amber-500"
                         onClick={() => setSelectedOrder(order)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div>
                               <span className="text-lg font-semibold">#{order.orderNumber}</span>
-                              <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded ml-2">Para Llevar</span>
+                              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded ml-2">Mostrador</span>
+                            </div>
+                            <span className="text-lg font-bold">{formatCurrency(order.total)}</span>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {order.items.length} items • {order.waiter?.name || 'Sin asignar'}
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {new Date(order.createdAt).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Takeaway orders section */}
+              {takeawayOrders.length > 0 && (
+                <div>
+                  <h2 className="text-sm font-medium text-blue-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Receipt className="h-4 w-4" />
+                    Para Llevar ({takeawayOrders.length})
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {takeawayOrders.map(order => (
+                      <Card
+                        key={order.id}
+                        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-blue-500"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <span className="text-lg font-semibold">#{order.orderNumber}</span>
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded ml-2">Para Llevar</span>
                             </div>
                             <span className="text-lg font-bold">{formatCurrency(order.total)}</span>
                           </div>
@@ -458,12 +511,15 @@ function CobrarContent() {
               {/* Table orders section */}
               {tableOrders.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Mesas ({tableOrders.length})</h2>
+                  <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Mesas ({tableOrders.length})
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {tableOrders.map(order => (
                       <Card
                         key={order.id}
-                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-gray-400"
                         onClick={() => setSelectedOrder(order)}
                       >
                         <CardContent className="p-4">
@@ -540,6 +596,47 @@ function CobrarContent() {
 
           {/* Payment options */}
           <div className="space-y-4">
+            {/* Customer info for takeout orders */}
+            {(selectedOrder.type === 'TAKEOUT' || (!selectedOrder.table && selectedOrder.type !== 'COUNTER')) && (
+              <Card>
+                <CardHeader className="pb-3 border-b">
+                  <CardTitle className="text-lg">Datos del Cliente</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Nombre</label>
+                    <input
+                      type="text"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      placeholder="Nombre del cliente"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Teléfono</label>
+                    <input
+                      type="text"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      placeholder="3001234567"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Dirección</label>
+                    <input
+                      type="text"
+                      value={customerAddress}
+                      onChange={(e) => setCustomerAddress(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      placeholder="Dirección de entrega"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Payment method */}
             <Card>
               <CardHeader className="pb-3 border-b">
